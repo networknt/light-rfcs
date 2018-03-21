@@ -41,8 +41,8 @@ services on our frameworks and more developers to contribute to our platform.
 
 # Guide-level explanation
 
-We are going install all these services in one of the VMs we have and will clean
-up everything once a month?
+All services will be installed in one of the VMs called api in the cloud and will 
+be cleaned up everything month?
 
 # Reference-level explanation
 
@@ -86,5 +86,4 @@ cloud or their personal computer. This will not help developers' productivity.
 * How to grant the access to developers? 
 
 * Are we going to use docker or just start these services as processes?
-
 
