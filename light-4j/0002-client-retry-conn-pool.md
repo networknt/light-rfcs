@@ -4,6 +4,8 @@ The current client module works very well for HTTP 2.0 server with HTTP 2.0 conn
 
 Also, we are relying on the caller to drop the connection after a certain number of requests or after certain minutes to force the client side load balancing. Need to build this into the module so that we can make this transparent for the developers. There is an issue opened for this at https://github.com/networknt/light-4j/issues/155
 
+Another enhancement for the client module is to handle the retry gracefully at module level with configurations. 
+
 
 
 
