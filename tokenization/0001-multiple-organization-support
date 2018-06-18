@@ -1,0 +1,12 @@
+### Muliple Oraganization Support
+
+The tokenization service to be built should support multiple organizations or multiple LOBs in the same organization at the same time with separate databases for data segregation and protection. In the future, we might host this service at lightapi.net for small and medium companies and sell the service to organizations that might have multiple LOBs to deploy in-house. 
+
+Given the above requirement, an onboarding process needs to to be in place to create a database or a new schema, and there must be a way to pass this org info in the endpoint to indicate which database or schema to get the token info. From security perspective, we need to ensure that the scopes in the access token map to the org in the endpoint so that cross-fire does not happen. 
+
+One way to enable fine-grained authorization is to use client JWT token client_id to map a database or schema. This mapping needs to be maintained in tokenization application with an admin interface or separate service. Several clients can be mapped to a database and during the runtime, the mapping is checked in a fine-grained authorization middleware handler.
+
+
+
+
+
