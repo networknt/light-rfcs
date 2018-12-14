@@ -29,10 +29,11 @@ Both ways have their own benefit in different scenarios. For instance, when some
 * If you need to use a literal ${ in your configuration file then you can write $${ to escape the expansion.
 
 ### Reference-level explanation
-
+An environment variable injector is been added after the parsing process of Json or Yaml. It provides two methods, "InjectMapEnv()" and "injectObjectEnv()" which able to inject environment variable into map or object respectively.
 
 ### Drawbacks
-
+* Extra Time is needed for traversal the entries of map or the fields of object.
+* There would be different format for Json and Yaml. For Json, the format is "\"${VAR}\"", otherwise, Json cannot parse the content without quotation marks.
 
 ### Rationale and Alternatives
 
