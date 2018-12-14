@@ -1,8 +1,8 @@
 ### Summary
-This enhancement provides users with an alternative way to config their services. There are two configuration ways, one is to assign values directly in the configuration file just like what we did before. The other is to set the value to an environment variable and use the '$' symbol in the yaml file to mark the values which need to be configurable. During the deployment process, the "preprocessor" will get the corresponding value for these variables marked by '$'symbol.
+  This enhancement provides users with an alternative way to config their services. There are two configuration ways, one is to assign values directly in the configuration file just like what we did before. The other is to set the value to an environment variable and use the '$' symbol in the yaml file to mark the values which need to be configurable. During the deployment process, the "preprocessor" will get the corresponding value for these variables marked by '$'symbol.
 
 ### Motivation
-Both ways have their own benefit in different scenarios. For instance, when some variables that need to be configured are generic variables, for example, the URL of the database. The user can choose auto-inject and set its value to an environment variable for centralized management.
+  Both ways have their own benefit in different scenarios. For instance, when some variables that need to be configured are generic variables, for example, the URL of the database. The user can choose auto-inject and set its value to an environment variable for centralized management.
 
 ### Guide-level explanation
 
@@ -29,7 +29,7 @@ Both ways have their own benefit in different scenarios. For instance, when some
 * If you need to use a literal ${ in your configuration file then you can write $${ to escape the expansion.
 
 ### Reference-level explanation
-An environment variable injector is been added after the parsing process of Json or Yaml. It provides two methods, "InjectMapEnv()" and "injectObjectEnv()" which able to inject environment variable into map or object respectively.
+  An environment variable "preproccessor" is been added after the parsing process of Json or Yaml. It provides two methods, "InjectMapEnv()" and "injectObjectEnv()" which able to inject environment variable into map or object respectively.
 
 ### Drawbacks
 * Extra Time is needed for traversal the entries of map or the fields of object.
