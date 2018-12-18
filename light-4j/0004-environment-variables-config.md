@@ -1,39 +1,154 @@
 ### Summary
-  This enhancement provides users with an alternative way to config their services. There are two configuration ways, one is to assign values directly in the configuration file just like what we did before. The other is to set the value to an environment variable and use the '$' symbol in the yaml file to mark the values which need to be configurable. During the deployment process, the "preprocessor" will get the corresponding value for these variables marked by '$'symbol.
+  This enhancement allows environment variables to be injected into the 
+  configuration file (Json/Yaml/Yml) based on the following rules:
+  
+  * ${VAR} 
+  
+    retrive the value named "VAR" from system property and replace "${VAR}"
+    with the value. If the value cannot be found, a ConfigException will 
+    be throwed.
+  
+  * ${VAR:default} 
+  
+    retrive the value named "VAR" from system property and replace "${VAR}"
+    with the value. If the value cannot be found, "${VAR}" will be replaced
+    with "default".
+  
+  * ${VAR:?error}
+  
+    retrive the value named "VAR" from system property and replace "${VAR}"
+    with the value. If the value cannot be found, a ConfigException contains
+    "error" will be throwed.
+  
+  * /${VAR}
+  
+    don't inject value.
 
 ### Motivation
-  Both ways have their own benefit in different scenarios. For instance, when some variables that need to be configured are generic variables, for example, the URL of the database. The user can choose auto-inject and set its value to an environment variable for centralized management.
+
 
 ### Guide-level explanation
-
-* environment variable reference format:
+* Implementation
   
-  ${VAR}
+    When the config data is first loaded from the configuration file, a 
+  preprocessor is used to preprocess the file's inputStream based on the 
+  replacement rules, and then use the resulting inputStream for 
+  configuration loading.
+  ```
+    InputStream inStream = EnvConfig.resolveYaml(inStream);
+  ```
+    or 
+  ```
+    InputStream inStream = EnvConfig.resolveJson(inStream);
+  ```
   
-  Where VAR is the name of the environment variable.
-
-  Each variable reference is replaced at startup by the value of the environment variable. The replacement is case-sensitive   and occurs before the YAML file is parsed. References to undefined variables are replaced by empty strings unless you specify a default value or custom error text.
-
-* To specify a default value, use:
-
-  ${VAR:default_value}
+    As shown above, class provides two methods for preprocessing json and 
+  yaml respectively. The details are as follows
   
-  Where default_value is the value to use if the environment variable is undefined.
-
-* To specify custom error text, use:
-
-  ${VAR:?error_text}
+    1. Convert InputStream into String for following operation.
   
-  Where error_text is custom text that will be prepended to the error message if the environment variable cannot be expanded.
+    2. Find the reference contents according to the regex pattern as follows
+  ```
+    private static Pattern pattern = Pattern.compile("[^/]\\$\\{(.*?)\\}(\")?");
+  ```
+      * `[^/]` means do not contain the `/`
+      * `\\$\\{` and `\\}` means contain `${` and `}`
+      * `(.*?)` means this part can match with every character sequneces
+      * `(\")?` means `"` is a selective character
+    
+    3. process the reference contents into the envirment variable
+  ```
+    private static EnvEntity getEnvEntity(String contents) {
+        EnvEntity envEntity = new EnvEntity();
+        contents = contents.trim();
+        if (contents == null || contents.equals("")) {
+            return null;
+        }
+        String[] rfcArray = contents.split(":", 2);
+        if ("".equals(rfcArray[0])) {
+            return null;
+        }
+        envEntity.setEnvName(rfcArray[0]);
+        if (rfcArray.length == 2) {
+            if (rfcArray[1].startsWith("?")) {
+                envEntity.setErrorText(rfcArray[1].substring(1));
+            } else {
+                envEntity.setDefaultValue(rfcArray[1]);
+            }
+        }
+        return envEntity;
+    }
+  ```
+    iii.1. get environment variables from system property
+  ```
+    private static Object getEnvVariable(String envName) {
+        return System.getenv(envName);
+    }
+  ```
+    iii.2. wrap the information got from reference contents into an object
+  called EnvEntity
+  ```
+    private static class EnvEntity {
+        private String envName;
+        private String defaultValue;
+        private String errorText;
 
-* If you need to use a literal ${ in your configuration file then you can write $${ to escape the expansion.
+        public String getErrorText() {
+            return errorText;
+        }
+
+        public void setErrorText(String errorTest) {
+            this.errorText = errorTest;
+        }
+
+        public String getDefaultValue() {
+            return defaultValue;
+        }
+
+        public void setDefaultValue(String defaultValue) {
+            this.defaultValue = defaultValue;
+        }
+
+        public String getEnvName() {
+            return envName;
+        }
+
+        public void setEnvName(String envName) {
+            this.envName = envName;
+        }
+    }
+
+    private static InputStream convertStringToStream(String string) {
+        return new ByteArrayInputStream(string.getBytes());
+    }
+  ```
+  
+    4. replace `[^/]\\$\\{(.*?)\\}(\")?` with the environment variable 
+  
+    5. convert the result String into InputStream, then output it.
+  
+* Tips
+
+  Whether to add quotes does not affect the actual function
+  i.e. `"${VAR}"` equivalent to `${VAR}`
+  
+  However, adding new line into curly bracket is not supported
+  i.e. `${\n}`
+  
+* Examples
+  
+  | Env Variables | Input | Output |
+  | --- | --- | --- |
+  | ENV: default | value: ${ENV} | value: default |
+  |  | value: ${ENV} | throw ConfigException |
+  |  | value: ${ENV:default} | value: default |
+  | ENV: default | value: /${ENV} | value: /${ENV} |
 
 ### Reference-level explanation
-  An environment variable "preprocessor" called "EnvConfig" is been added after the parsing process of Json or Yaml. It provides two methods, "InjectMapEnv()" and "injectObjectEnv()" which able to inject environment variable into map or object respectively.
+
 
 ### Drawbacks
-* Extra Time is needed for traversal the entries of map or the fields of object.
-* There would be different format for Json and Yaml. For Json, the format is "\"${VAR}\"", otherwise, Json cannot parse the content without quotation marks.
+
 
 ### Rationale and Alternatives
 
