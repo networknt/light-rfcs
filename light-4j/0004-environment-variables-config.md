@@ -135,6 +135,8 @@
   However, adding new line into curly bracket is not supported
   i.e. `${\n}`
   
+  A flag called `isEnableInjection` is provided to enable or disable this feature
+  
 * Examples
   
   | Env Variables | Input | Output |
