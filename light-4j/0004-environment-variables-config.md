@@ -20,7 +20,7 @@
     with the value. If the value cannot be found, a ConfigException contains
     "error" will be throwed.
   
-  * /${VAR}
+  * ${VAR:$}
   
     don't inject value.
 
@@ -123,7 +123,7 @@
     }
   ```
   
-    4. replace `[^/]\\$\\{(.*?)\\}(\")?` with the environment variable 
+    4. replace `\\$\\{(.*?)\\}` with the environment variable 
   
     5. convert the result String into InputStream, then output it.
   
@@ -139,12 +139,12 @@
   
 * Examples
   
-  | Env Variables | Input | Output |
-  | --- | --- | --- |
-  | ENV: default | value: ${ENV} | value: default |
-  |  | value: ${ENV} | throw ConfigException |
-  |  | value: ${ENV:default} | value: default |
-  | ENV: default | value: /${ENV} | value: /${ENV} |
+  | Env Variables | Input | Output | Action |
+  | --- | --- | --- | --- |
+  | ENV: default | value: ${ENV} | value: default | inject environment variable |
+  |  | value: ${ENV} | throw ConfigException | exception |
+  |  | value: ${ENV:default} | value: default | inject default |
+  | ENV: default | value: ${ENV:$} | value: ${ENV} | skip injection | 
 
 ### Reference-level explanation
 
