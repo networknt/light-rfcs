@@ -1,0 +1,12 @@
+consul:
+  - ttlCheck: true
+  - checkInterval: ${CheckInterval}
+
+cors:
+  - allowedMethods:
+      -GET
+      -POST
+      
+1. Before injection environment variable, find the corresponding part 
+which matches with current config filename. adding these part to the
+end of current config file. (the latter will overwrite the front in yaml)
