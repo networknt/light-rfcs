@@ -23,6 +23,15 @@
   * ${VAR:$}
   
     don't inject value.
+    
+  * Examples
+  
+  | Environment Variable | Input | Output | Action |
+  | --- | --- | --- | --- |
+  | VAR: default | value: ${VAR} | value: default | inject environment variable |
+  | VAR: null | value: ${VAR} | throw ConfigException | exception |
+  | VAR: null | value: ${VAR:default} | value: default | inject default |
+  | VAR: default | value: ${VAR:$} | value: ${ENV} | skip injection | 
 
 ### Motivation
 
@@ -31,34 +40,30 @@
 * Implementation
   
     When the config data is first loaded from the configuration file, a 
-  preprocessor is used to preprocess the file's inputStream based on the 
-  replacement rules, and then use the resulting inputStream for 
-  configuration loading.
+  preprocessor is used to preprocess the file's string based on the 
+  replacement rules, and then use the resulting String for configuration 
+  loading.
   ```
-    InputStream inStream = EnvConfig.resolveYaml(inStream);
+    String injectedConfigString = EnvInjection.inject(ConfigString);
   ```
-    or 
-  ```
-    InputStream inStream = EnvConfig.resolveJson(inStream);
-  ```
-  
-    As shown above, class provides two methods for preprocessing json and 
-  yaml respectively. The details are as follows
+    As shown above, the `EnvInjection` provides a method called `inject` 
+    for preprocessing json and yaml respectively. The details are as follows
   
     1. Convert InputStream into String for following operation.
   
     2. Find the reference contents according to the regex pattern as follows
   ```
-    private static Pattern pattern = Pattern.compile("[^/]\\$\\{(.*?)\\}(\")?");
+    private static Pattern pattern = Pattern.compile("\\$\\{(.*?)\\}");
   ```
-      * `[^/]` means do not contain the `/`
       * `\\$\\{` and `\\}` means contain `${` and `}`
       * `(.*?)` means this part can match with every character sequneces
-      * `(\")?` means `"` is a selective character
     
     3. process the reference contents into the envirment variable
   ```
-    private static EnvEntity getEnvEntity(String contents) {
+        private static EnvEntity getEnvEntity(String contents) {
+        if (contents == null || contents.equals("")) {
+            return null;
+        }
         EnvEntity envEntity = new EnvEntity();
         contents = contents.trim();
         if (contents == null || contents.equals("")) {
@@ -72,7 +77,9 @@
         if (rfcArray.length == 2) {
             if (rfcArray[1].startsWith("?")) {
                 envEntity.setErrorText(rfcArray[1].substring(1));
-            } else {
+            }else if(rfcArray[1].startsWith("$")) {
+                envEntity.setDefaultValue("\\$\\{" + rfcArray[0] + "\\}");
+            }else {
                 envEntity.setDefaultValue(rfcArray[1]);
             }
         }
@@ -124,27 +131,26 @@
   ```
   
     4. replace `\\$\\{(.*?)\\}` with the environment variable 
-  
-    5. convert the result String into InputStream, then output it.
+    
   
 * Tips
-
-  Whether to add quotes does not affect the actual function
-  i.e. `"${VAR}"` equivalent to `${VAR}`
   
-  However, adding new line into curly bracket is not supported
+  Adding new line into curly bracket is not supported
   i.e. `${\n}`
   
-  A flag called `isEnableInjection` is provided to enable or disable this feature
-  
-* Examples
-  
-  | Env Variables | Input | Output | Action |
-  | --- | --- | --- | --- |
-  | ENV: default | value: ${ENV} | value: default | inject environment variable |
-  |  | value: ${ENV} | throw ConfigException | exception |
-  |  | value: ${ENV:default} | value: default | inject default |
-  | ENV: default | value: ${ENV:$} | value: ${ENV} | skip injection | 
+  A flag called `isEnableInjection` is provided to enable or disable this feature, 
+  it can be set by using commend line.
+  ```
+    private static String enabled = System.getProperty(ENABLE_ENV_VARIABLE_INJECTION, "").toLowerCase();
+
+    public static boolean isEnabled() {
+        if ("false".equals(enabled)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+  ```
 
 ### Reference-level explanation
 
@@ -153,6 +159,7 @@
 
 
 ### Rationale and Alternatives
+We hope to further expand this pre-processing chain. Next we will try to implement a centralized configuration. See more details in https://github.com/jiachen1120/light-rfcs/edit/develop/light-4j/0004-environment-variables-config.md
 
 
 ### Unresolved questions
