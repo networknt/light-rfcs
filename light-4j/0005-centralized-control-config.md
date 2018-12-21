@@ -23,13 +23,13 @@
     List can be overrided with any List. It should be noticed that , the current design 
     is to replace the entire list since the value of the linked list cannot be located 
     with key. That is, it does not support adding new values to the original list. Maybe
-    it will be supported later. List can be nested in Map. 
+    it will be supported later. This List can be nested in Map. 
     
   * Override Map
   
     Map can be overrided partically. by provide partial key-value pair. The centralized
-    management will nevigate to corresponding position of value and then override. Map can
-    be nested in List or Map.
+    management will nevigate to corresponding position of value and then override. This
+    Map can be nested in List or Map.
   
 * Example
 
