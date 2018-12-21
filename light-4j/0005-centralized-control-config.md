@@ -10,6 +10,27 @@
 
 
 ### Guide-level explanation
+* Feature
+
+  This enhancement support overriding Stirng, List, and Map.
+  
+  * Override String
+  
+    String can be overrided with any String, including environment variables by pattern.
+    
+  * Override List
+  
+    List can be overrided with any List. It should be noticed that , the current design 
+    is to replace the entire list since the value of the linked list cannot be located 
+    with key. That is, it does not support adding new values to the original list. Maybe
+    it will be supported later. List can be nested in Map. 
+    
+  * Override Map
+  
+    Map can be overrided partically. by provide partial key-value pair. The centralized
+    management will nevigate to corresponding position of value and then override. Map can
+    be nested in List or Map.
+  
 * Example
 
   Suppose we need to change the port value and database password in the `server.yaml` 
