@@ -26,12 +26,17 @@
     
   * Examples
   
-  | Environment Variable | Input | Output | Action |
-  | --- | --- | --- | --- |
-  | VAR: default | value: ${VAR} | value: default | inject environment variable |
-  | VAR: null | value: ${VAR} | throw ConfigException | exception |
-  | VAR: null | value: ${VAR:default} | value: default | inject default |
-  | VAR: default | value: ${VAR:$} | value: ${ENV} | skip injection | 
+    | Environment Variable | Input | Output | Action |
+    | --- | --- | --- | --- |
+    | VAR: default | value: ${VAR} | value: default | inject environment variable |
+    | VAR: null | value: ${VAR} | throw ConfigException | exception |
+    | VAR: null | value: ${VAR:default} | value: default | inject default |
+    | VAR: default | value: ${VAR:$} | value: ${ENV} | skip injection | 
+  
+  * Enable Flag
+  
+    Please define `true` or `false` for `enable_centralized_management` in commend line in order to enable this enhancement.
+  The default status is `true` without setting.
 
 ### Motivation
 
@@ -58,7 +63,8 @@
       * `\\$\\{` and `\\}` means contain `${` and `}`
       * `(.*?)` means this part can match with every character sequneces
     
-    3. process the reference contents into the envirment variable
+    3. process the reference contents`${(.*?)}` into the corresponding envirment 
+    variable.
   ```
         private static EnvEntity getEnvEntity(String contents) {
         if (contents == null || contents.equals("")) {
@@ -69,18 +75,18 @@
         if (contents == null || contents.equals("")) {
             return null;
         }
-        String[] rfcArray = contents.split(":", 2);
-        if ("".equals(rfcArray[0])) {
+        String[] array = contents.split(":", 2);
+        if ("".equals(array[0])) {
             return null;
         }
-        envEntity.setEnvName(rfcArray[0]);
-        if (rfcArray.length == 2) {
-            if (rfcArray[1].startsWith("?")) {
-                envEntity.setErrorText(rfcArray[1].substring(1));
-            }else if(rfcArray[1].startsWith("$")) {
-                envEntity.setDefaultValue("\\$\\{" + rfcArray[0] + "\\}");
+        envEntity.setEnvName(array[0]);
+        if (array.length == 2) {
+            if (array[1].startsWith("?")) {
+                envEntity.setErrorText(array[1].substring(1));
+            }else if(array[1].startsWith("$")) {
+                envEntity.setDefaultValue("\\$\\{" + array[0] + "\\}");
             }else {
-                envEntity.setDefaultValue(rfcArray[1]);
+                envEntity.setDefaultValue(array[1]);
             }
         }
         return envEntity;
@@ -131,26 +137,7 @@
   ```
   
     4. replace `\\$\\{(.*?)\\}` with the environment variable 
-    
   
-* Tips
-  
-  Adding new line into curly bracket is not supported
-  i.e. `${\n}`
-  
-  A flag called `isEnableInjection` is provided to enable or disable this feature, 
-  it can be set by using commend line.
-  ```
-    private static String enabled = System.getProperty(ENABLE_ENV_VARIABLE_INJECTION, "").toLowerCase();
-
-    public static boolean isEnabled() {
-        if ("false".equals(enabled)) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-  ```
 
 ### Reference-level explanation
 
@@ -159,7 +146,9 @@
 
 
 ### Rationale and Alternatives
-We hope to further expand this pre-processing chain. Next we will try to implement a centralized configuration. See more details in https://github.com/jiachen1120/light-rfcs/edit/develop/light-4j/0004-environment-variables-config.md
+  We hope to further expand this pre-processing chain. Next we will try to implement a centralized configuration. See more details in https://github.com/jiachen1120/light-rfcs/edit/develop/light-4j/0004-environment-variables-config.md
 
 
 ### Unresolved questions
+  Adding new line into curly bracket is not supported
+  i.e. `${\n}`
