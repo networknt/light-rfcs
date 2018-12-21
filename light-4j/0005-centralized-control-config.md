@@ -1,5 +1,5 @@
 ### Summary
-This enhancement provides the ability to centrally manage configuration files. By 
+  This enhancement provides the ability to centrally manage configuration files. By 
 defining in a centralized management file called `values.json` or `values.yaml`
 or `values.yml`. default value located in different config file can be selectively 
 override with any value (Including environment variables by pattern). As the result,
@@ -12,7 +12,7 @@ changed.
 ### Guide-level explanation
 * Example
 
-Suppose we need to change the port value and database password in the `server.yaml` 
+  Suppose we need to change the port value and database password in the `server.yaml` 
 and `service.yaml` respectively. Such `values.yaml` can be defined.
 ```
 // values.yaml
