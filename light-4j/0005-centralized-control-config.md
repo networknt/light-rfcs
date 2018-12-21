@@ -16,20 +16,23 @@
   
   * Override String
   
-    String can be overrided with any String, including environment variables by pattern.
+    String can be overrided with any String, List or Map, including environment variables 
+    by pattern.
     
   * Override List
   
-    List can be overrided with any List. It should be noticed that , the current design 
-    is to replace the entire list since the value of the linked list cannot be located 
-    with key. That is, it does not support adding new values to the original list. Maybe
-    it will be supported later. This List can be nested in Map. 
+    List can be overrided with any String, List, Map. It should be noticed that, the current 
+    design is to replace the entire list if there is no nested Map which could be overrided
+    ,since the value of the linked list cannot be located with key. Therefore, it does not 
+    support adding new values to the original list. Maybe it will be supported later. 
+    This List can be nested in Map. 
     
   * Override Map
   
     Map can be overrided partically. by provide partial key-value pair. The centralized
     management will nevigate to corresponding position of value and then override. This
-    Map can be nested in List or Map.
+    Map can be nested in List or Map. If the Map cannot be overrided with provided key-value, 
+    whole map will be replaced.
   
 * Example
 
@@ -90,7 +93,19 @@
         prepStmtCacheSqlLimit: 2048
         connectionTimeout: 2000
   ```
+  
+  * Implementation
+  ```flow
+  st=>start: Start
+  e=>end
+  op=>operation: My Operation
+  cond=>condition: Yes or No?
 
+  st->op->cond
+  cond(yes)->e
+  cond(no)->op
+  ```
+      
 ### Reference-level explanation
 
 
