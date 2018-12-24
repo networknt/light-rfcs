@@ -10,6 +10,11 @@
 
     Please define `true` or `false` for `enable_centralized_management` in commend line in 
     order to enable this enhancement. The default status is `true` without setting.
+    
+  * Unique key
+    
+    In order to let centralized management work properly. each key can only appear once in
+    one config file.
 
 ### Motivation
 
