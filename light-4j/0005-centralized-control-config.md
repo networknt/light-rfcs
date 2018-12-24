@@ -95,8 +95,13 @@
   ```
   
   * Implementation
+  
+    1. The configuration file is first parsed into the map because it is easier to merge than using 
+    the object.
     
-    There are two methods provided by `CentralizedManagement.class` to merge the value of 
+    2. The value.yaml is also parsed into map
+    
+    3. There are two methods provided by `CentralizedManagement.class` to merge the value of 
     values.yaml into ObjectConfig or MapConfig respectively.
     ```
     public static Map<String, Object> merge(String configName, Map<String, Object> config) {
@@ -117,7 +122,7 @@
         return convertMapToObj(config, clazz);
     }
     ```
-    The merge process is recursive
+    4. The merge process is recursive
     ```
     private static void merge(Object m1, Object m2) {
         if (m1 instanceof Map && m2 instanceof Map) {
