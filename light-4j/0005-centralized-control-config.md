@@ -1,7 +1,7 @@
 ### Summary
   This enhancement provides the ability to centrally manage configuration files. By 
   defining in a centralized management file called `values.json` or `values.yaml`
-  or `values.yml`. default value located in different config file can be selectively 
+  or `values.yml`. Values located in different config file can be selectively 
   override with any value (Including environment variables by pattern). As the result,
   There would be no necessary to change previous code when config value need to be 
   changed.
@@ -17,7 +17,7 @@
 ### Guide-level explanation
 * Feature
 
-  This enhancement support overriding Stirng, List, and Map.
+  This enhancement support overriding Stirng, List, and Map, regardless nested in List or Map.
   
   * Override String
   
@@ -26,18 +26,13 @@
     
   * Override List
   
-    List can be overrided with any String, List, Map. It should be noticed that, the current 
-    design is to replace the entire list if there is no nested Map which could be overrided
-    ,since the value of the linked list cannot be located with key. Therefore, it does not 
-    support adding new values to the original list. Maybe it will be supported later. 
-    This List can be nested in Map. 
+    List can be overrided with any String, List or Map, including environment variables 
+    by pattern.
     
   * Override Map
   
-    Map can be overrided partically. by provide partial key-value pair. The centralized
-    management will nevigate to corresponding position of value and then override. This
-    Map can be nested in List or Map. If the Map cannot be overrided with provided key-value, 
-    whole map will be replaced.
+    Map can be overrided with any String, List or Map, including environment variables 
+    by pattern.
   
 * Example
 
@@ -100,6 +95,52 @@
   ```
   
   * Implementation
+    
+    There are two methods provided by `CentralizedManagement.class` to merge the value of 
+    values.yaml into ObjectConfig or MapConfig respectively.
+    ```
+    public static Map<String, Object> merge(String configName, Map<String, Object> config) {
+        if (valueConfig == null) {
+            logger.error("centralized management file \"values.yaml\" cannot be found");
+            return config;
+        }
+        merge(config, valueConfig.get(configName));
+        return config;
+    }
+
+    public static Object merge(String configName, Map<String, Object> config, Class clazz) {
+        if (valueConfig == null) {
+            logger.error("centralized management file \"values.yaml\" cannot be found");
+            return convertMapToObj(config, clazz);
+        }
+        merge(config, valueConfig.get(configName));
+        return convertMapToObj(config, clazz);
+    }
+    ```
+    The merge process is recursive
+    ```
+    private static void merge(Object m1, Object m2) {
+        if (m1 instanceof Map && m2 instanceof Map) {
+            Iterator<String> fieldNames = ((Map<String, Object>) m1).keySet().iterator();
+            while (fieldNames.hasNext()) {
+                String fieldName = fieldNames.next();
+                Object field1 = ((Map<String, Object>) m1).get(fieldName);
+                Object field2 = ((Map<String, Object>) m2).get(fieldName);
+                if (field1 != null && field2 == null
+                        && (field1 instanceof Map || field1 instanceof List)) {
+                    merge(field1, m2);
+                } else if (field2 != null) {
+                    ((Map<String, Object>) m1).put(fieldName, field2);
+                }
+            }
+        } else if (m1 instanceof List) {
+            for (Object field1 : ((List<Object>) m1)) {
+                merge(field1, m2);
+            }
+        }
+    }
+    ```
+    
       
 ### Reference-level explanation
 
