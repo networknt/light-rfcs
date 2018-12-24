@@ -5,6 +5,11 @@
   override with any value (Including environment variables by pattern). As the result,
   There would be no necessary to change previous code when config value need to be 
   changed.
+  
+  * Enable Flag
+
+    Please define `true` or `false` for `enable_centralized_management` in commend line in 
+    order to enable this enhancement. The default status is `true` without setting.
 
 ### Motivation
 
@@ -38,60 +43,60 @@
 
   Suppose we need to change the port value and database password in the `server.yaml` 
   and `service.yaml` respectively. Such `values.yaml` can be defined.
-  ```
-  // values.yaml
   
-  server:
-    port:8080
+  * values.yaml
+  ```
+    server:
+      port:8080
+    service:
+      password: mysql
 
-  service:
-    singleton:
-      - javax.sql.DataSource:
-        -com.zaxxer.hikari.HikariDataSource:
+  ```
+  
+  * server.yaml
+  ```
+    port: 4563
+  ```
+
+  * service.yaml
+  ```
+    singletons:
+    - javax.sql.DataSource:
+      - com.zaxxer.hikari.HikariDataSource:
+          DriverClassName: oracle.jdbc.pool.OracleDataSource
+          jdbcUrl: jdbc:oracle:thin:@localhost:1521:XE
+          username: SYSTEM
+          password: oracle
+          maximumPoolSize: 10
+          useServerPrepStmts: true
+          cachePrepStmts: true
+          cacheCallableStmts: true
+          prepStmtCacheSize: 10
+          prepStmtCacheSqlLimit: 2048
+          connectionTimeout: 2000
+  ```
+  
+  * Result
+  ```
+    // server.yaml
+    port: 8080
+  
+  
+    // service.yaml
+    singletons:
+    - javax.sql.DataSource:
+      - com.zaxxer.hikari.HikariDataSource:
+          DriverClassName: oracle.jdbc.pool.OracleDataSource
+          jdbcUrl: jdbc:oracle:thin:@localhost:1521:XE
+          username: SYSTEM
           password: mysql
-
-
-  // server.yaml
-  port: 4563
-
-
-  // service.yaml
-  singletons:
-  - javax.sql.DataSource:
-    - com.zaxxer.hikari.HikariDataSource:
-        DriverClassName: oracle.jdbc.pool.OracleDataSource
-        jdbcUrl: jdbc:oracle:thin:@localhost:1521:XE
-        username: SYSTEM
-        password: oracle
-        maximumPoolSize: 10
-        useServerPrepStmts: true
-        cachePrepStmts: true
-        cacheCallableStmts: true
-        prepStmtCacheSize: 10
-        prepStmtCacheSqlLimit: 2048
-        connectionTimeout: 2000
-  ```
-  The result should be:
-  ```
-  // server.yaml
-  port: 8080
-  
-  
-  // service.yaml
-  singletons:
-  - javax.sql.DataSource:
-    - com.zaxxer.hikari.HikariDataSource:
-        DriverClassName: oracle.jdbc.pool.OracleDataSource
-        jdbcUrl: jdbc:oracle:thin:@localhost:1521:XE
-        username: SYSTEM
-        password: mysql
-        maximumPoolSize: 10
-        useServerPrepStmts: true
-        cachePrepStmts: true
-        cacheCallableStmts: true
-        prepStmtCacheSize: 10
-        prepStmtCacheSqlLimit: 2048
-        connectionTimeout: 2000
+          maximumPoolSize: 10
+          useServerPrepStmts: true
+          cachePrepStmts: true
+          cacheCallableStmts: true
+          prepStmtCacheSize: 10
+          prepStmtCacheSqlLimit: 2048
+          connectionTimeout: 2000
   ```
   
   * Implementation
