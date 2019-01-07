@@ -1,6 +1,6 @@
 ### Summary
-  This enhancement allows both environment variables and variables from file to be 
-  injected into the configuration file (Json/Yaml/Yml) based on the following rules:
+  This enhancement allows both environment variables and variables from file called `values.yaml` 
+  to be injected into the configuration file (Json/Yaml/Yml) based on the following rules:
   
   * ${VAR} 
   
