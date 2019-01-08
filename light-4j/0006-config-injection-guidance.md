@@ -41,6 +41,9 @@
    2. Inject from system environment first, then inject from "values.yaml". mode code "1"
    3. Inject from "values.yaml" first, then override with the values in the system environment.
       mode code "2"
+      
+  * Support Types
+   The values to be injected can be String, List, Map.
 
 ### Motivation
 
