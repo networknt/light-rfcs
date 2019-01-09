@@ -1,5 +1,5 @@
 ### Summary
-  This enhancement allows both environment variables and variables from the file called `values.yaml` 
+  This enhancement allows both environment variables and values(String, List, Map) from the file called `values.yaml` 
   to be injected into the configuration file (JSON/YAML/Yml) based on the following rules:
   
   * ${VAR} 
