@@ -25,91 +25,95 @@
   
     1. Basic injection rules overview
     
-    | Environment Variable | values.yaml | Input | Output | Action |
-    | --- | --- | --- | --- | --- |
-    | VAR: default | N/A | value: ${VAR} | value: default | inject environment variable |
-    | N/A | N/A | value: ${VAR} | throw ConfigException | exception |
-    | N/A | N/A | value: ${VAR:default} | value: default | inject default |
-    | VAR: default | N/A | value: ${VAR:$} | value: ${ENV} | skip injection | 
-    | N/A | VAR:default | value: ${VAR} | value: default | inject value from values.yaml | 
+      | Environment Variable | values.yaml | Input | Output | Action |
+      | --- | --- | --- | --- | --- |
+      | VAR: default | N/A | value: ${VAR} | value: default | inject environment variable |
+      | N/A | N/A | value: ${VAR} | throw ConfigException | exception |
+      | N/A | N/A | value: ${VAR:default} | value: default | inject default |
+      | VAR: default | N/A | value: ${VAR:$} | value: ${ENV} | skip injection | 
+      | N/A | VAR:default | value: ${VAR} | value: default | inject value from values.yaml | 
+    
     
     
     2. A mocked up example
     
-    server.yml:
-    ```
-    buildNumber: ${server.buildNumber:latest}
-    ```
-    values.yml:
-    ```
-    server.buildNumber: 123
-    ```
-    environment variables:
-    ```
-    server.buildNumber=456
-    ```
+      server.yml:
+      ```
+      buildNumber: ${server.buildNumber:latest}
+      ```
+      values.yml:
+      ```
+      server.buildNumber: 123
+      ```
+      environment variables:
+      ```
+      server.buildNumber=456
+      ```
     
-    case1: Both value source exist
+      case1: Both value source exist
     
-    If the order code equals to [0]: buildNumber: 123
+      If the order code equals to [0]: buildNumber: 123
     
-    If the order code equals to [1]: buildNumber: 123
+      If the order code equals to [1]: buildNumber: 123
     
-    If the order code equals to [2]: buildNumber: 456
+      If the order code equals to [2]: buildNumber: 456
     
-    If the order code equals not set:buildNumber: 456 (default[2])
+      If the order code equals not set:buildNumber: 456 (default[2])
 
-    case2: Only environment variable is provided
+      
+      case2: Only environment variable is provided
     
-    If the order code equals to [0]: buildNumber: latest
+      If the order code equals to [0]: buildNumber: latest
     
-    If the order code equals to [1]: buildNumber: 456
+      If the order code equals to [1]: buildNumber: 456
     
-    If the order code equals to [2]: buildNumber: 456
+      If the order code equals to [2]: buildNumber: 456
     
-    If the order code equals not set:buildNumber: 456 (default[2])
+      If the order code equals not set:buildNumber: 456 (default[2])
 
-    case3: only values.yaml is provided
+      
+      case3: only values.yaml is provided
     
-    If the order code equals to [0]: buildNumber: 123
+      If the order code equals to [0]: buildNumber: 123
     
-    If the order code equals to [1]: buildNumber: 123
+      If the order code equals to [1]: buildNumber: 123
     
-    If the order code equals to [2]: buildNumber: 123
+      If the order code equals to [2]: buildNumber: 123
     
-    If the order code equals not set:buildNumber: 123 (default[2])
+      If the order code equals not set:buildNumber: 123 (default[2])
 
-    case4:Neither environment variable or values.yaml is not provided
+      case4:Neither environment variable or values.yaml is not provided
     
-    If the order code equals to [0]: buildNumber: latest
+      If the order code equals to [0]: buildNumber: latest
     
-    If the order code equals to [1]: buildNumber: latest
+      If the order code equals to [1]: buildNumber: latest
     
-    If the order code equals to [2]: buildNumber: latest
+      If the order code equals to [2]: buildNumber: latest
     
-    If the order code equals not set:buildNumber: latest (default[2])
+      If the order code equals not set:buildNumber: latest (default[2])
+    
     
     
     3. Use cases of injecting List/Map
     
-    By injecting list/map, IP whitelist can be config easier.
+      By injecting list/map, IP whitelist can be config easier.
     
-    whitelists.yaml:
-    ```
-    paths:${IPS}
-    ```
-    values.yaml:
-    ```
-    IPS:
-      - '127.0.0.1'
-      - '10.10.*.*'
-    ```
-    result of whitelists.yaml:
-    ```
-    paths:
-      - '127.0.0.1'
-      - '10.10.*.*'
-    ```
+      whitelists.yaml:
+      ```
+      paths:${IPS}
+      ```
+      values.yaml:
+      ```
+      IPS:
+        - '127.0.0.1'
+        - '10.10.*.*'
+      ```
+      result of whitelists.yaml:
+      ```
+      paths:
+        - '127.0.0.1'
+        - '10.10.*.*'
+      ```
     
     
   * Work mode
