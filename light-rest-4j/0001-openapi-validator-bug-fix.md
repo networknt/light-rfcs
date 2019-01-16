@@ -310,7 +310,7 @@ work properly
     ```
 * Query parameter:
     
-    All schema validators can work for path parameter can also work properly
+    All schema validators that can work for path parameter can also work properly
     for query parameter.
     
     In addition, query parameter can support array validator now and following
