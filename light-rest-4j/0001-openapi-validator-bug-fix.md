@@ -3,11 +3,14 @@
 In current implementation, partial validators of path parameters and query 
 parameters cannot work properly. 
 
-The main reason for this is that the path parameters and the query parameters
-are only recognized as strings since they are located in URL. 
+There are three main reasons:
 
-In addition, URL decode is also needed before validating and arrays included by
-query parameter should be validated entirely.
+1. The path parameters and the query parameters are only recognized as strings 
+since they are located in URL. 
+
+2. URL decode for path parameter is needed before validating 
+
+3. arrays included by query parameter should be validated entirely.
 ### Motivation
 
 
