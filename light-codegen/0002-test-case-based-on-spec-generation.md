@@ -20,20 +20,6 @@ Right now we don't have validators to validate Response Schemas. For example:
     	          type: object
     	          $ref: '#/components/schemas/ErrorInfo'
 
-Should we add validate response schema feature in ValidatorHandler or in test cases?
-
-- Do validating response in ValidatorHandler:
-
-    Need to add a callback when Exchange complete get the response body, then validate.
-
-        exchange.addExchangeCompleteListener((exchange, nextListener) -> {})
-
-    By doing this way has some problems:
-
-    We couldn't get response body efficiently, because undertow send response body through ConduitStreamSinkChannel directly, we could get response body by implementing Conduit and add to Response Wrapper. In this way, **no matter if the content passes the validation or not, the response content is already sent.** 
-
-    **Doing validating response in ValidatorHandler is unrealistic**, unless we find another way to validate response content.
-
 - Do response validation in test cases:
 
     We need to generate a valid request url based on request schemas, so that we can reach the handler we expect to test. Then, validate different scenarios based on status codes. For example:
