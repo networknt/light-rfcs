@@ -30,6 +30,13 @@ This setting is an array of strings. Each of them is a regular expression to spe
 This hostname validation only be turned on when the income request carries the new "service_url" header.
 The "hostWhitelist" setting can be optional if the service url header is not provided.
 
+In the service configuration (service.yml), the HostWhitelist bean must also be defined. The following is an example:
+```
+- com.networknt.router.HostWhitelist:
+  - com.networknt.router.HostWhitelist
+```
+Same as the setting in router.yml, this HostWhitelist bean can be optional if the service url header is not provided.
+
 ### Drawbacks
 Caller of the router service must know the exact service url.
 
