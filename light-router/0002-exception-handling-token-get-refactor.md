@@ -83,4 +83,3 @@ Thus, we need a generic way to handle error scenarios so that we can send respon
 
 - For Http2Client Module, there are many duplicate code comparing to Router module, should we refactor two places with duplicate changes? Or we need to rethink about it?
 
-[Current Exception Problems](https://www.notion.so/d09e29716b4341558d94785b4b815232)
