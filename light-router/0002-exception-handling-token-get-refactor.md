@@ -34,52 +34,41 @@ Thus, we need a generic way to handle error scenarios so that we can send respon
 
             result = Failure.of(new Status(GET_TOKEN_ERROR, responseBody));
 
-- Add a @FunctionalInterface to define callback function when fail
-
-        private void getCCToken(FailureHandleable callback) {
-                Result<TokenResponse> result = getCCTokenResponse();
-                if(result.isSuccess()) {
-                    TokenResponse tokenResponse = result.getResult();
-                    jwt = tokenResponse.getAccessToken();
-                    // the expiresIn is seconds and it is converted to millisecond in the future.
-                    expire = System.currentTimeMillis() + tokenResponse.getExpiresIn() * 1000;
-                    logger.info("Get client credentials token {} with expire_in {} seconds", jwt, tokenResponse.getExpiresIn());
-                } else {
-                    callback.handle(result.getError());
-                }
-            }
-
 - Refactor TokenHandler.checkCCTokenExpired()
+    - change method name to populateCCToken
+    - instead of modifying class member directly, should populate the given JWT info passed as parameters
+    - move this method to OauthHelper and make it static so that this part can be used in multiple modules(Http2Client, TokenHandler)
 
-        boolean isInRenewWindow = expire - System.currentTimeMillis() < tokenRenewBeforeExpired;
-        logger.trace("isInRenewWindow = " + isInRenewWindow);
-        if(!isInRenewWindow) { return; }
-        synchronized (TokenHandler.class) {
-            //if token expired, try to renew synchronize
-            if(expire <= System.currentTimeMillis()) {
-                //the token can be renew when it's not on renewing or current time is lager than retrying interval
-                if (!renewing || System.currentTimeMillis() > expiredRetryTimeout) {
-                    renewing = true;
-                    expiredRetryTimeout = System.currentTimeMillis() + expiredRefreshRetryDelay;
-                    getCCToken((status) -> {
-                        //set renewing flag to false when fail
-                        renewing = false;
-                        //on get token failure, send response back according to status
-                        OauthHelper.sendStatusToResponse(exchange, status);
-                    });
-                    //set renewing flag to false when success
-                    renewing = false;
-                }
-            }else {
-                // Not expired yet, try to renew async but let requests use the old token.
-                logger.trace("In renew window but token is not expired yet.");
-                if(!renewing || System.currentTimeMillis() > earlyRetryTimeout) {
-                    asyncRenewCCToken();
+            public static Result<Jwt> populateCCToken(Jwt jwt) {
+                boolean isInRenewWindow = jwt.getExpire() - System.currentTimeMillis() < jwt.getTokenRenewBeforeExpired();
+                logger.trace("isInRenewWindow = " + isInRenewWindow);
+                //if not in renew window, return the current jwt.
+                if(!isInRenewWindow) { return Success.of(jwt); }
+                //block other getting token requests, only once at a time.
+                //Once one request get the token, other requests don't need to get from auth server anymore.
+                synchronized (Http2Client.class) {
+                    //if token expired, try to renew synchronously
+                    if(jwt.getExpire() <= System.currentTimeMillis()) {
+                        Result<Jwt> result = renewCCTokenSync(jwt);
+                        if(logger.isTraceEnabled()) logger.trace("Check secondary token is done!");
+                        return result;
+                    } else {
+                        //otherwise renew token silently
+                        renewCCTokenAsync(jwt);
+                        if(logger.isTraceEnabled()) logger.trace("Check secondary token is done!");
+                        return Success.of(jwt);
+                    }
                 }
             }
-        }
 
-    Something we need to discuss is the ***synchronized*** keyword, the previous code is using Double-checked locking ******to check "if(expire <= System.currentTimeMillis())", may accelerate the process. We need to discuss how big differences between these two.
+    - The whole process is synchronized to prevent multiple requests to get token at the same time.
+    - Pass error Status through return type com.networknt.monad.Result, instead of throwing exceptions
 
-- For Http2Client Module, there are many duplicate code comparing to Router module, should we refactor two places with duplicate changes? Or we need to rethink about it?
+a issue may be related to this router change is:  StatelessAuthHandler [light-4j/#322](https://github.com/networknt/light-4j/issues/322)
+## Before change vs After change
 
+|                      Cases                      |                                               Response/Behaviors                                               |                                                                    Message                                                                    | Message                                                                                                                                                                                                                      |
+|:-----------------------------------------------:|:--------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------:|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|                Connection Refused               |                                             400: Uncaught Exception                                            | { "statusCode": 500, "code": "ERR10010", "message": "RUNTIME_EXCEPTION", "description": "Unexpected runtime exception", "severity": "ERROR" } | { "statusCode": 401, "code": "ERR10053", "message": "ESTABLISH_CONNECTION_ERROR", "description": "Cannot establish connection for url ${url}", "severity": "ERROR" }                                                         |
+| Connection Established, but fail to send reques |                             500: Unexpected Runtime Exception fail to send request                             |                                                                                                                                               | { "statusCode": 401, "code": "ERR10054", "message": "GET_TOKEN_TIMEOUT", "description": "Cannot get valid token, probably due to a timeout.", "severity": "ERROR" }                                                          |
+|    wrong client_id/client_secret combination    | NullPointerException (can receive response from layer7 but layer7 doesn't response a JWT but an error message) | { "statusCode": 500, "code": "ERR10010", "message": "RUNTIME_EXCEPTION", "description": "Unexpected runtime exception", "severity": "ERROR" } | {"statusCode":401,"code":"ERR10052","message":"GET_TOKEN_ERROR","description":"Cannot get valid token: { "error":"invalid_client", "error_description":"The given client credentials were not valid" }.","severity":"ERROR"} |
