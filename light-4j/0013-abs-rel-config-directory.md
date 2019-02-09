@@ -11,6 +11,8 @@ The current code is predicated on reading the config file from a directory relat
 There are use cases where a microservice or utility tool is required to read configs from either a relative or absolute path.
 
 As a use-case, for example: the light-bot tool uses a relative path when merging statuses, and it is predicated on file being available under a common root
+
+```
 - project: abc
   file: status
   repository:
@@ -19,8 +21,11 @@ As a use-case, for example: the light-bot tool uses a relative path when merging
     - api-abc-status/src/main/resources/config/abcde
   output: api-abc/src/main/resources/config
   outputFormat: yml
+```
 
 With an absolute path, such code might be expressed, for example, as:
+
+```
 - project: abc
   file: status
   repository:
@@ -29,10 +34,12 @@ With an absolute path, such code might be expressed, for example, as:
     - /Users/userX/work/api-abc-status/src/main/resources/config/abcde
   output: /Users/userX/work/api-abc/src/main/resources/config
   outputFormat: yml
+```
 
 ### Guide-level explanation
 
 The current code is limiting the loading to the "light-4j-config-dir" path, or paths relative to it:
+
 ```
   ...
   private InputStream getConfigStream(String configFilename) {
@@ -42,10 +49,10 @@ The current code is limiting the loading to the "light-4j-config-dir" path, or p
   ...
 ```
 
-The implementation should check whether the path starts with a ```/``` and handle the situation of either:
-- absolute path: ```/Users/userX/work/light-4j/status/src/main/resources/config```
+The implementation should check whether the path starts with a `/` and handle the situation of either:
+- absolute path: `/Users/userX/work/light-4j/status/src/main/resources/config`
 or
-- relative path to "light-4j-config-dir": ```light-4j/status/src/main/resources/config```
+- relative path to "light-4j-config-dir": `light-4j/status/src/main/resources/config`
 
 ### Reference-level explanation
 

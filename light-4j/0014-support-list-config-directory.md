@@ -22,8 +22,8 @@ These are just examples.
 
 ### Guide-level explanation
 
-The format of "light-4j-config-dir" could be, as an example: ```-Dlight-4j-config-dir='/config:/etc/service:/var/secrets' ```
-```
+The format of "light-4j-config-dir" could be, as an example: `-Dlight-4j-config-dir=/config:/etc/service:/var/secrets`
+
 
 ### Reference-level explanation
 

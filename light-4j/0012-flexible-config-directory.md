@@ -12,6 +12,8 @@ There are use cases where a microservice or utility tool is required to read con
 
 As a use-case: the light-bot tool already employs similar code, as it must read status.yml files from multiple sources in order to merge them.
 - tools as the networknt:light-bot project for loading config files from multiple locations
+
+```
   - project: abc
     file: status
     repository:
@@ -20,18 +22,21 @@ As a use-case: the light-bot tool already employs similar code, as it must read 
       - api-abc-status/src/main/resources/config/abcde
     output: api-abc/src/main/resources/config
     outputFormat: yml
+```
 
 Another use case: configurations, respectively microservice specific data is intended to be loaded from separate directories
 - specifying configurations in multiple folders, in addition to the standard /src/main/resources/config
 
 ### Guide-level explanation
 
-```
 The Config.loadMapConfig(String fileName) method can be overloaded with a directory location as:
+
+```
   Config.loadMapConfig(String fileName, String directoryName).
 ```
 
 Implicitly, the getConfigStream(String configFilename) method must be overloaded with a directory location as:
+
 ```
   Config.getConfigStream(String configFilename, String directoryName).
 ```
