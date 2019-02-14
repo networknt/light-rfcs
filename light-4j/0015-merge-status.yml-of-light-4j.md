@@ -20,6 +20,20 @@ and in Status.java load both status.yml and light-status.yml.
 
 If there are conflicts(most likely in existing projects which are already merge with status.yml manually), the light-status.yml should overwrites the status.yml defined in its own project.(**need to discuss**)
 
+## Alternate solution
+
+Instead of rename the framework's default status.yml. To rename user's customizerd status.yml to application.yml would be better. The reasons are:
+
+1. In the light-4j, almost every module has a config file that has the same name with the module. If we rename the framework's status.yml to light-status.yml would make some confusion.
+
+2. More backward compatible. For those people who prefer manually merge status.yml. There would be no changes for them. For those people who want to automatically merge, simply providing an application-status.yml. Their customized status code would be merged automatically.
+
+The merging rule should be 
+
+If the status code in application-status.yml is not contained by status.yml, the status code will be append to default status list.
+
+If the status code in application-status.yml is contained by status.yml, an Exception should be thrown since the status code in status.yml is used by framework itself, they should be immutable. 
+
 ## Backward Compatible:
 
 I don't see any compatible issue unless they have duplicate error codes for their business with error codes for the platform. Besides those info in light-4j/status.yml is only for the framework.
