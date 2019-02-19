@@ -30,9 +30,9 @@ Instead of rename the framework's default status.yml. To rename user's customize
 
 The merging rule should be:
 
-**[1]** If the status code in application-status.yml is not contained by status.yml, the status code will be append to default status list.
+**[1]** If the status code in application-status.yml is not contained by status.yml, the status code will be appended to default status list.
 
-**[2]** If the status code in application-status.yml is contained by status.yml, the default value will be overwritten, and this behaviour will be recorded in log.
+**[2]** If the status code in application-status.yml is contained by status.yml, the default value will be overwritten, and this behavior will be recorded in log.
 
 ## Backward Compatible:
 
