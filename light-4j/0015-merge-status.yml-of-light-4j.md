@@ -16,7 +16,20 @@ The merging rule should be:
 
 **[1]** If the status code in app-status.yml is not contained by status.yml, the status code will be appended to default status list.
 
-**[2]** If the status code in app-status.yml is contained by status.yml, a RuntimeException will be thrown. 
+**[2]** If any status code in app-status.yml is contained by status.yml, a RuntimeException will be thrown and contains the list of duplicated status codes.
 
-Since the status is lazy init, the merge process should be completed at  startup to achieve a fast fail.
+For example,
+```
+"The status codes: [ERR10000, ERR10001] in status.yml and app-status.yml are duplicated."
+```
 
+Since the status is lazy init, the merge process should be completed at startup to achieve the "fast fail". A method used to merge the status.yml and app-status.yml will be provided in the server module. And it will be added to the method init().
+```
+try {
+// load config files from light-config-server if possible.
+loadConfig();
+// merge status.yml and app-status.yml if app-status.yml is provided
+mergeStatusConfig();
+start();
+} catch (RuntimeException e) {
+```
