@@ -9,7 +9,7 @@ For rocker hot-reloading to work properly, the config file `rocker-compiler.conf
 If `rocker-compiler.conf` and `codegen-cli.jar` are in the same folder, the command below can be used to run the codegen-cli (`target/classes` is the default output folder of re-compiled templates).  
 
 ````
-java -cp target/classes/:./codegen-cli.jar com.networknt.codegen.Cli -f
+java -cp target/classes/:./codegen-cli.jar com.networknt.codegen.Cli -f ...
 ````
 
 A shell script codegen.sh is provided to help users setting up config files and output folders.
