@@ -25,5 +25,3 @@ For the light-portal user management, are we using the current user management s
 
 With blockchain to manage the user, we can charge the fee for the service access on a request basis easily. With normal user management, we need to have a way to manage the account balance of the customer and charge them on a monthly basis. 
 
-
-
