@@ -69,7 +69,7 @@ oauth:
       # This must point to the JSON Web Keys service path
       uri: /oauth2/key
       # This is the service URL of the JSON Web Keys service
-      server_url: https://cbvrhmccver01d.cloud1.cibc.com:8443
+      server_url: https://cloud1.networknt.com:8443
       # set to true if the oauth2 provider supports HTTP/2
       enableHttp2: false
 ...

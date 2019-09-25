@@ -38,7 +38,7 @@ singletons:
   - com.networknt.codegen.HandlerClassGenerator:
     - com.networknt.codegen.rest.JavaHandlerGenerator
   - com.networknt.codegen.FeatureGenerator
-      - com.cibc.apif.queue.codegen.ApifQGenerator        
+      - com.networknt.codegen.QueueGenerator        
 ```
 
 ### Drawbacks
